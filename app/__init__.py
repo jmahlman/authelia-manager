@@ -2,15 +2,15 @@
 from flask import Flask, session, redirect, send_from_directory, make_response, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
 from datetime import timedelta
+import logging
 import os
 
 
 # Flask Setup
 app = Flask(__name__)
 app.config.update(
-SECRET_KEY                        = os.environ.get('SECRET_KEY', os.urandom(24).hex()),
+SECRET_KEY                        = os.environ.get('SECRET_KEY', 'change-me-set-SECRET_KEY-env'),
 SESSION_COOKIE_NAME               = "authelia-manager_session",
 SESSION_COOKIE_HTTPONLY            = True,
 SESSION_COOKIE_SAMESITE           = "Lax",
@@ -22,11 +22,13 @@ SQLALCHEMY_DATABASE_URI           = os.environ.get('DATABASE_URI', "sqlite:///au
 SQLALCHEMY_TRACK_MODIFICATIONS    = False
 )
 
-# CSRF Protection
-# SameSite=Lax cookies + @login_required provide CSRF protection.
-# CSRFProtect is initialized but all blueprints are exempt since the
-# app has no cross-origin form targets and uses session-based auth.
-csrf = CSRFProtect(app)
+# Logging
+log_level = logging.DEBUG if app.config['DEBUG'] else logging.INFO
+logging.basicConfig(level=log_level, format='%(asctime)s [%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
+
+if app.config['SECRET_KEY'] == 'change-me-set-SECRET_KEY-env':
+    logger.warning("SECRET_KEY not set! Sessions will break across restarts. Set the SECRET_KEY environment variable.")
 
 # Session Setup
 @app.before_request
@@ -52,12 +54,10 @@ def load_user(userid):
 # API
 from app.blueprints import api
 app.register_blueprint(api.api)
-csrf.exempt(api.api)
 
 #UI
 from app.blueprints import ui
 app.register_blueprint(ui.ui)
-csrf.exempt(ui.ui)
 
 # Auto-seed users from Authelia users_database.yml
 from app.helpers.seed_users import seed_users_from_authelia
