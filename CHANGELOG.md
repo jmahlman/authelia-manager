@@ -1,6 +1,9 @@
 # 2026/05/19
 Modernization update for Python 3.13+ compatibility (forward-compatible with 3.14)
 
+## Documentation
+- Added wiki page: Connecting to Authelia (setup, first-time init, reverse proxy examples)
+
 ## CI/CD
 - Added GitHub Actions workflow to build and push container to ghcr.io on push
 - Image published to `ghcr.io/jmahlman/authelia-manager` (replaces `beardedtek/authelia-manager:demo`)
