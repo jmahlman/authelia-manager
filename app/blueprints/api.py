@@ -182,7 +182,7 @@ def api_login():
         user = users.query.filter_by(user=username).first()
         # check if the user actually exists
         # take the user-supplied password, hash it, and compare it to the hashed password in the database
-        if user and argon2verify(user.hash,password):
+        if user and argon2verify(user.hash,password).verify():
             flash(f"Welcome back, {user.display}")
             login_user(user)
         else:

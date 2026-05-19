@@ -1,6 +1,15 @@
 # 2026/05/19
 Modernization update for Python 3.13+ compatibility (forward-compatible with 3.14)
 
+## Auto-seed Users
+- Users in Authelia's `users_database.yml` with the `authelia-manager` group are automatically imported on startup
+- Reuses existing Authelia argon2 password hash (same credentials for both systems)
+- Upserts on each startup: new users are created, existing users get updated email/display/groups/hash
+- No manual `docker exec` needed for initial setup
+
+## Bug Fixes
+- Fixed login authentication: `argon2verify` was not actually calling `.verify()` (always returned truthy)
+
 ## Documentation
 - Added wiki page: Connecting to Authelia (setup, first-time init, reverse proxy examples)
 

@@ -53,3 +53,7 @@ app.register_blueprint(api.api)
 #UI
 from app.blueprints import ui
 app.register_blueprint(ui.ui)
+
+# Auto-seed users from Authelia users_database.yml
+from app.helpers.seed_users import seed_users_from_authelia
+seed_users_from_authelia(app, db)
