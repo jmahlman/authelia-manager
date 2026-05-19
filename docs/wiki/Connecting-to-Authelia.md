@@ -68,17 +68,39 @@ services:
 
 ## First-Time Setup
 
-### 1. Start the container
+### 1. Add the `authelia-manager` group to your Authelia users
+
+In your Authelia `users_database.yml`, add the `authelia-manager` group to any user that should have access to the management UI:
+
+```yaml
+users:
+    myuser:
+        password: $argon2id$v=19$m=4096,t=3,p=1$...
+        displayname: My User
+        email: myuser@example.com
+        groups:
+            - admins
+            - authelia-manager
+        disabled: false
+```
+
+### 2. Start the container
 
 ```bash
 docker compose up -d
 ```
 
-### 2. Initialize the database
+On startup, authelia-manager automatically reads the mounted `users_database.yml` and imports any users in the `authelia-manager` group into its internal database. Their Authelia password hash is reused, so they log in with the same credentials.
 
-Navigate to `http://localhost:9999`. You'll be redirected to the login page, but no users exist yet.
+### 3. Log in
 
-The database needs to be initialized first. Since `/api/initdb` requires authentication, you need to create the initial user manually:
+Go to `http://localhost:9999/ui/login` and log in with your Authelia credentials.
+
+Users are re-synced on every container restart. If you add or remove users from the `authelia-manager` group, or change passwords in Authelia, restart the container to pick up the changes.
+
+### Alternative: Manual user creation
+
+If you prefer not to use the auto-seed (or need a standalone admin user not in Authelia), you can create one manually:
 
 ```bash
 docker exec -it authelia-manager python3 -c "
@@ -103,10 +125,6 @@ with app.app_context():
 ```
 
 Replace `your-password-here` with your desired password.
-
-### 3. Log in
-
-Go to `http://localhost:9999/ui/login` and log in with the credentials you just created.
 
 ## Protecting Authelia-Manager with Authelia
 
