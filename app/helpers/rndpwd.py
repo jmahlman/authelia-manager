@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from random import randint,choice
+import secrets
 import string
 
 class randpwd:
@@ -23,16 +23,9 @@ class randpwd:
         if key == True:
             count = 128
         else:
-            count = randint(24,63)
-        password = ""
-        for x in range(count):
-            num = randint(0,2)
-            if num == 0:
-                password += choice(string.ascii_lowercase)
-            elif num == 1:
-                password += choice(string.ascii_uppercase)
-            elif num == 2:
-                password += choice(string.digits)
+            count = secrets.randbelow(40) + 24
+        alphabet = string.ascii_letters + string.digits
+        password = ''.join(secrets.choice(alphabet) for _ in range(count))
         return password
 
 if __name__ == '__main__':

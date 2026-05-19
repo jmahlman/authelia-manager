@@ -2,6 +2,7 @@
 from flask import Flask, session, redirect, send_from_directory, make_response, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from datetime import timedelta
 import os
 
@@ -9,15 +10,20 @@ import os
 # Flask Setup
 app = Flask(__name__)
 app.config.update(
-SECRET_KEY                        = "SECRET_KEY",
+SECRET_KEY                        = os.environ.get('SECRET_KEY', os.urandom(24).hex()),
 SESSION_COOKIE_NAME               = "authelia-manager_session",
+SESSION_COOKIE_HTTPONLY            = True,
+SESSION_COOKIE_SAMESITE           = "Lax",
 STATIC_FOLDER                     = "static",
 TEMPLATES_FOLDER                  = "templates",
 DEBUG                             = False,
 TESTING                           = False,
-SQLALCHEMY_DATABASE_URI           = "sqlite:///authelia-manager.sqlite",
+SQLALCHEMY_DATABASE_URI           = os.environ.get('DATABASE_URI', "sqlite:///authelia-manager.sqlite"),
 SQLALCHEMY_TRACK_MODIFICATIONS    = False
 )
+
+# CSRF Protection
+csrf = CSRFProtect(app)
 
 # Session Setup
 @app.before_request
@@ -27,7 +33,6 @@ def before_request():
 
 # Database Setup
 db = SQLAlchemy(app)
-app.SQLALCHEMY_TRACK_MODIFICATIONS=False
 
 # Flask Login Setup
 from app.models.users import users

@@ -1,5 +1,5 @@
 # External Imports
-from flask import Blueprint, escape, redirect, jsonify, make_response, render_template
+from flask import Blueprint, redirect, jsonify, make_response, render_template
 from flask_login import login_required
 from sqlalchemy import desc
 import os
@@ -10,15 +10,10 @@ from app.models.config import config
 def auth_method():
     try:
         query = config.query.all()
-        print(f"query: {query}")
         CONFIG = iterateQuery(query)
-        print(CONFIG)
-        print(CONFIG[1]['auth_backend'])
         auth = CONFIG[1]['auth_backend']
-        print(auth)
-    except:
+    except Exception:
         auth="none"
-    print(auth)
     return auth
 
 # API Blueprint Setup
@@ -95,7 +90,6 @@ def ui_login():
 @ui.route('/ui')
 @login_required
 def ui_main():
-    print(auth_method)
     output = render_template('ui-main.html',auth_method=auth_method())
     return make_response(output)
 @ui.route('/edit/<data>')

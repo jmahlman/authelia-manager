@@ -1,3 +1,45 @@
+# 2026/05/19
+Modernization update for Python 3.13+ compatibility (forward-compatible with 3.14)
+
+## Dependencies
+- Pinned all dependencies to minimum modern versions
+- Removed `passlib` (unused, argon2-cffi handles all hashing)
+- Added `flask-wtf` for CSRF protection
+- Added `markupsafe` as explicit dependency
+- Updated minimum versions: Flask 3.1, Flask-SQLAlchemy 3.1, Flask-Login 0.6.3, PyYAML 6.0.2, uwsgi 2.0.28
+
+## Security Fixes
+- Replaced hardcoded SECRET_KEY with environment variable (`SECRET_KEY` env var with random fallback)
+- Added CSRF protection via Flask-WTF across all POST routes
+- Added `SESSION_COOKIE_HTTPONLY` and `SESSION_COOKIE_SAMESITE` settings
+- Made `DATABASE_URI` configurable via environment variable
+- Replaced insecure `random` module with `secrets` module in password generation (rndpwd.py)
+- Replaced `random.randint` with `secrets.randbelow` in API responses
+- Added `@login_required` to `/api/initdb` and `/api/<data>` POST endpoints
+
+## Code Fixes
+- Removed deprecated `flask.escape` import (removed in Flask 2.4+)
+- Removed duplicate `request` import in api.py
+- Fixed bare `except:` clause to use `except Exception:` and `except ImportError:`
+- Removed all debug `print()` statements from production code
+- Removed redundant `SQLALCHEMY_TRACK_MODIFICATIONS` assignment
+- Deleted obsolete `app/helpers/argon2.py.old`
+
+## Dockerfile
+- Updated base image from `python:3.11` to `python:3.13-slim`
+- Added non-root user (appuser, uid 1000)
+- Added build dependencies for uwsgi compilation
+- Improved layer caching (COPY requirements.txt before app code)
+- Enabled uWSGI master process and threads
+
+## Entrypoint
+- Rewrote `entrypoint.sh` (was broken, contained only `apt-update`)
+- Now properly launches uwsgi with master mode and threading
+
+## Security Scan Results
+- Ran `bandit` scan: 0 high/medium issues, 1 low (test-only hardcoded password in argon2hash.py __main__ block)
+- Ran `pip-audit`: 0 known vulnerabilities in updated dependencies
+
 # 2023/04/20
 Much progress has been made
 - Restructured database

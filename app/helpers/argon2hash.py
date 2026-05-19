@@ -2,7 +2,7 @@ from argon2 import PasswordHasher
 from argon2 import exceptions as argon2Exceptions
 try:
     from app.helpers.rndpwd import randpwd
-except:
+except ImportError:
     from rndpwd import randpwd
 
 class argon2hash:
@@ -20,12 +20,8 @@ class argon2hash:
 class argon2verify:
     def __init__(self,argon_hash,password):
         self.hash = argon_hash
-        print(self.hash)
         self.password=password
-        print(self.password)
-
         self.ph = PasswordHasher()
-        print("Initialized PasswordHasher()")
 
     def verify(self):
         output = None

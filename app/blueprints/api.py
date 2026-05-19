@@ -2,10 +2,10 @@
 # External Imports
 import yaml
 import json
-from flask import Blueprint, jsonify, make_response, render_template, request, redirect, flash, url_for, request
+import secrets
+from flask import Blueprint, jsonify, make_response, render_template, request, redirect, flash, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from os import path, access, R_OK, getcwd
-import random
 
 # Internal Imports
 from app.helpers.argon2hash import argon2hash, argon2verify
@@ -35,6 +35,7 @@ def apiDoc():
     return make_response(render_template('apidocs.html',apidocs=Markdown))
 
 @api.route('/api/initdb',methods=['GET'])
+@login_required
 def apiInitDB():
     """
     Initialize the database
@@ -88,9 +89,9 @@ def apiDataGET(data):
     return output
 
 @api.route('/api/<data>',methods=['POST'])
+@login_required
 def api_data_post(data):
     jsonData = request.get_json()
-    print(jsonData)
     if data == "users":
         try:
             query = users.query.filter_by(id=jsonData['id']).first()
@@ -108,17 +109,14 @@ def api_data_post(data):
                 changes = True
                 query.notes = jsonData['note']
             if changes:
-                print("changes")
                 db.session.commit()
                 output = {"return":0}
             else:
-                print("no changes")
                 output = {"return":1,"error":"No changes"}
         except Exception as error:
-            print(f"ERROR: {error}")
             output = {"return":11,"error":str(error)}
     else:
-        error_code = random.randint(0,2)
+        error_code = secrets.randbelow(3)
         output = {"return":error_code}
         if error_code != 0:
             output['error'] = "Test Error Code"
