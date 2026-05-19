@@ -12,7 +12,7 @@ from app.helpers.argon2hash import argon2hash, argon2verify
 from app.helpers.rndpwd import randpwd
 from app.helpers.apidocs import apidocs
 from app.helpers.iterateQuery import iterateQuery
-from app import db
+from app import db, csrf
 
 from app.models.file_auth import file_auth
 from app.models.group import group
@@ -89,6 +89,7 @@ def apiDataGET(data):
     return output
 
 @api.route('/api/<data>',methods=['POST'])
+@csrf.exempt
 @login_required
 def api_data_post(data):
     jsonData = request.get_json()
