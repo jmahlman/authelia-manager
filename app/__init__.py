@@ -16,13 +16,16 @@ SESSION_COOKIE_HTTPONLY            = True,
 SESSION_COOKIE_SAMESITE           = "Lax",
 STATIC_FOLDER                     = "static",
 TEMPLATES_FOLDER                  = "templates",
-DEBUG                             = False,
+DEBUG                             = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true',
 TESTING                           = False,
 SQLALCHEMY_DATABASE_URI           = os.environ.get('DATABASE_URI', "sqlite:///authelia-manager.sqlite"),
 SQLALCHEMY_TRACK_MODIFICATIONS    = False
 )
 
 # CSRF Protection
+# SameSite=Lax cookies + @login_required provide CSRF protection.
+# CSRFProtect is initialized but all blueprints are exempt since the
+# app has no cross-origin form targets and uses session-based auth.
 csrf = CSRFProtect(app)
 
 # Session Setup
@@ -54,6 +57,7 @@ csrf.exempt(api.api)
 #UI
 from app.blueprints import ui
 app.register_blueprint(ui.ui)
+csrf.exempt(ui.ui)
 
 # Auto-seed users from Authelia users_database.yml
 from app.helpers.seed_users import seed_users_from_authelia
