@@ -174,11 +174,12 @@ def api_gen_password():
 
 @api.route('/api/login', methods=['POST'])
 def api_login():
-    # login code goes here
-    username = request.form.get('user')
+    login_id = request.form.get('user')
     password = request.form.get('password')
     try:
-        user = users.query.filter_by(user=username).first()
+        user = users.query.filter_by(user=login_id).first()
+        if not user:
+            user = users.query.filter_by(email=login_id).first()
         # check if the user actually exists
         # take the user-supplied password, hash it, and compare it to the hashed password in the database
         if user and argon2verify(user.hash,password).verify():
