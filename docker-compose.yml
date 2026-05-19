@@ -1,8 +1,9 @@
-version: '3'
 services:
   authelia-manager:
-    image: beardedtek/authelia-manager:demo
-    container_name: authelia-manager-demo
+    image: ghcr.io/jmahlman/authelia-manager:latest
+    container_name: authelia-manager
     ports:
       - 9999:5000
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-}
     restart: unless-stopped

@@ -1,6 +1,13 @@
 # 2026/05/19
 Modernization update for Python 3.13+ compatibility (forward-compatible with 3.14)
 
+## CI/CD
+- Added GitHub Actions workflow to build and push container to ghcr.io on push
+- Image published to `ghcr.io/jmahlman/authelia-manager` (replaces `beardedtek/authelia-manager:demo`)
+- Tags: branch name, semver on tags (v*), git SHA, and `latest` on main
+- Updated `docker-compose.yml` to use new ghcr.io image
+- Upgraded compose file from version 3 syntax to modern format
+
 ## Dependencies
 - Pinned all dependencies to minimum modern versions
 - Removed `passlib` (unused, argon2-cffi handles all hashing)
