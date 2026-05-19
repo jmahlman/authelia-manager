@@ -4,6 +4,9 @@ docker/data
 __pycache__/
 *.py[cod]
 *$py.class
+*CLAUDE.md
+.claude/
+
 
 # C extensions
 *.so
