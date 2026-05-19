@@ -1,0 +1,63 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto min-h-screen">
+    <div class="flex flex-col items-center justify-center px-1 py-1 lg:px-6 lg:py-6 mb-4 min-h-max lg:py-0">
+        <div class="w-full max-w-screen-2xl dark:text-white pt-4 p-2 mb-4">
+            <p class="text-2xl font-bold">Manage Users</p>
+            <p class="text-sm text-gray-400 pt-1">Users synced from Authelia's users_database.yml (authelia-manager group)</p>
+        </div>
+
+        <div id="usersTable" class="w-full max-w-screen-2xl">
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Username</th>
+                            <th scope="col" class="px-6 py-3">Display Name</th>
+                            <th scope="col" class="px-6 py-3">Email</th>
+                            <th scope="col" class="px-6 py-3">Groups</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="inline-flex items-center px-5 py-2.5 mt-4 text-sm font-medium text-center text-white bg-blue-800 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800" onClick="loadUsers()">Refresh</button>
+    </div>
+</div>
+
+<script>
+async function loadUsers() {
+    const response = await fetch('/api/users');
+    if (!response.ok) {
+        notify('Failed to load users', 'error', 'loadUsersError');
+        return;
+    }
+    const data = await response.json();
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+
+    for (let id in data) {
+        const user = data[id];
+        const row = document.createElement('tr');
+        row.className = 'bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600';
+        row.innerHTML = `
+            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${user.user || ''}</td>
+            <td class="px-6 py-4">${user.display || ''}</td>
+            <td class="px-6 py-4">${user.email || ''}</td>
+            <td class="px-6 py-4">${user.groups || ''}</td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    if (Object.keys(data).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center dark:text-gray-400">No users found. Add the <code>authelia-manager</code> group to users in your Authelia users_database.yml and restart.</td></tr>';
+    }
+}
+
+loadUsers();
+</script>
+{% endblock %}

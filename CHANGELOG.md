@@ -7,8 +7,13 @@ Modernization update for Python 3.13+ compatibility (forward-compatible with 3.1
 - Upserts on each startup: new users are created, existing users get updated email/display/groups/hash
 - No manual `docker exec` needed for initial setup
 
+## Users Management Page
+- Added `/users` page with a table showing all synced users (username, display name, email, groups)
+- Fetches data from the existing `/api/users` endpoint
+
 ## Bug Fixes
 - Fixed login authentication: `argon2verify` was not actually calling `.verify()` (always returned truthy)
+- Fixed CSRF token error on login: exempted API blueprint from CSRF (all routes protected by @login_required and SameSite cookies)
 
 ## Documentation
 - Added wiki page: Connecting to Authelia (setup, first-time init, reverse proxy examples)

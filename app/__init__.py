@@ -49,6 +49,7 @@ def load_user(userid):
 # API
 from app.blueprints import api
 app.register_blueprint(api.api)
+csrf.exempt(api.api)
 
 #UI
 from app.blueprints import ui
